@@ -29,21 +29,21 @@ var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Import Data
-d3.csv("data.csv").then(function(journalismData) {
+d3.csv("data.csv").then(function(lifeData) {
 
     //Parse Data/Cast as numbers
-    journalismData.forEach(function(data) {
+    lifeData.forEach(function(data) {
       data.poverty = +data.poverty;
       data.healthcare = +data.healthcare;
     });
 
     // Create scale functions
     var xLinearScale = d3.scaleLinear()
-      .domain([8, d3.max(journalismData, d => d.poverty)])
+      .domain([8, d3.max(lifeData, d => d.poverty)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([2, d3.max(journalismData, d => d.healthcare)])
+      .domain([2, d3.max(lifeData, d => d.healthcare)])
       .range([height, 0]);
 
     // Create axis functions
@@ -61,50 +61,29 @@ d3.csv("data.csv").then(function(journalismData) {
 
     // Create Circles
     var circlesGroup = chartGroup.selectAll("circle")
-    .data(journalismData)
+    .data(lifeData)
     .enter()
     .append("circle")
     .classed('stateCircle', true)
     .attr("cx", d => xLinearScale(d.poverty))
     .attr("cy", d => yLinearScale(d.healthcare))
     .attr("r", "15")
-    .attr("opacity", ".5")
+    .attr("opacity", ".75")
 
     // Add text to circles
-    chartGroup.selectAll("text")
-    .data(journalismData)
+    var textGroup = chartGroup.selectAll("stateText")
+    .data(lifeData)
     .enter()
     .append("text")
+    .text(d => d.abbr)
     .classed("stateText", true)
+    .attr("text-anchor", "middle")
+    .attr("alignment-baseline", "middle")
     .attr("x", d => xLinearScale(d.poverty))
     .attr("y", d => yLinearScale(d.healthcare))
     .attr('stroke', 'black')
     .attr('font-size', "10px")
-    .text(d => d.abbr)
-   
-    // Step 6: Initialize tool tip
-    // ==============================
-    // var toolTip = d3.tip()
-    //   .attr("class", "d3-tip")
-    //   .offset([80, -60])
-    //   .html(function(d) {
-    //     return (`% In Poverty: ${d.poverty}<br>% Lacking Healthcare: ${d.healthcare}`);
-    //   });
-
-    // // Step 7: Create tooltip in the chart
-    // // ==============================
     
-    // chartGroup.call(toolTip);
-
-    // // Step 8: Create event listeners to display and hide the tooltip
-    // // ==============================
-    // circlesGroup.on("click", function(data) {
-    //   toolTip.show(data, this);
-    // })
-    //   // onmouseout event
-    //   .on("mouseout", function(data, index) {
-    //     toolTip.hide(data);
-    //   });
 
     // Create axes labels
     chartGroup.append("text")
